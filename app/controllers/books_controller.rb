@@ -4,10 +4,16 @@ class BooksController < ApplicationController
   end
   
   def create
-    book = Book.new(book_params)
-    book.save
-    redirect_to '/books'
-    flash[:notice] = "successfully" 
+    books = Book.new(book_params)
+    respond_to do |format|
+      if books.save
+        format.html{redirect_to books, notice: 'Book was successfully created.'}
+        format.json { render :show, status: :created, location: books }
+    else
+       format.html { render :new }
+       format.json { render json: books.errors, status: :unprocessable_entity }
+    end
+   end
   end
 
   def index
