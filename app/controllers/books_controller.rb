@@ -4,16 +4,14 @@ class BooksController < ApplicationController
   end
   
   def create
-    books = Book.new(book_params)
-    respond_to do |format|
-      if books.save
-        format.html{redirect_to books, notice: 'Book was successfully created.'}
-        format.json { render :show, status: :created, location: books }
+    @book = Book.new(book_params)
+    if @book.save
+      flash[:notice] = 'Book was successfully created.'
+      redirect_to book_path(@book)
     else
-       format.html { render :new }
-       format.json { render json: books.errors, status: :unprocessable_entity }
+      @books = Book.all
+      render :index
     end
-   end
   end
 
   def index
@@ -26,18 +24,23 @@ class BooksController < ApplicationController
   end
 
   def edit
-    @edit_book = Book.find(params[:id])
+    @book = Book.find(params[:id])
   end
   
   def update
-    book = Book.find(params[:id])
-    book.update(book_params)
-    redirect_to book_path(book.id)
+    @book = Book.find(params[:id])
+    if @book.update(book_params)
+      flash[:notice] = 'Book was successfly updated'
+      redirect_to book_path(@book.id)
+    else
+      render :edit
+    end
   end
   
   def destroy
     book = Book.find(params[:id])
     book.destroy
+     flash[:notice] = 'Book was successfully destroyed.'
     redirect_to '/books'
   end
     
